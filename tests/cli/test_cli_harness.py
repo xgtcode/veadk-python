@@ -46,6 +46,8 @@ def test_harness_create_add_show_core_workflow() -> None:
                 "Research carefully.",
                 "--runtime",
                 "adk",
+                "--mcp-router-id",
+                "mt-1",
                 "--short-term-memory-type",
                 "sqlite",
                 "--max-llm-calls",
@@ -61,6 +63,7 @@ def test_harness_create_add_show_core_workflow() -> None:
         assert data["skills"] == ["summarizer"]
         assert data["system_prompt"] == "Research carefully."
         assert data["runtime"] == "adk"
+        assert data["mcp_router_id"] == "mt-1"
         assert data["short_term_memory"]["type"] == "sqlite"
         assert data["max_llm_calls"] == 8
 
@@ -72,7 +75,13 @@ def test_harness_create_add_show_core_workflow() -> None:
         assert "Configured agent params" in show_result.output
         assert "--model-name" in show_result.output
         assert "--system-prompt" in show_result.output
+        assert "--mcp-router-id" in show_result.output
         assert "--registry-space-id" not in show_result.output
+        assert "--builtin-tools" not in show_result.output
+        assert "--selected-skills" not in show_result.output
+        assert not any(
+            line.strip().startswith("--mcp:") for line in show_result.output.splitlines()
+        )
 
 
 def test_harness_invoke_reads_record_and_sends_overrides(monkeypatch) -> None:
@@ -152,3 +161,22 @@ def test_harness_invoke_requires_message() -> None:
 
     assert result.exit_code != 0
     assert "Provide a prompt" in result.output
+
+
+def test_harness_invoke_does_not_expose_structured_override_flags() -> None:
+    result = CliRunner().invoke(
+        cli_harness.harness,
+        [
+            "invoke",
+            "--name",
+            "research-agent",
+            "--url",
+            "https://example.invalid",
+            "--builtin-tools",
+            '[{"id":"web_search"}]',
+            "hello",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "No such option: --builtin-tools" in result.output

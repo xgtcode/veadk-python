@@ -383,6 +383,10 @@ def _connection_options(func):
 
 
 _HTTP_ONLY_OVERRIDE_FIELDS = {
+    "builtin_tools",
+    "selected_skills",
+    "mcp",
+    "registry",
     "knowledgebase",
     "longterm_memory",
     "temperature",
@@ -481,6 +485,7 @@ def add(
     skills: str | None,
     system_prompt: str | None,
     runtime: str | None,
+    mcp_router_id: str | None,
     **connection: str | None,
 ) -> None:
     """Write agent parameters into `harness.yaml`.
@@ -513,6 +518,8 @@ def add(
         data["system_prompt"] = system_prompt
     if runtime is not None:
         data["runtime"] = runtime
+    if mcp_router_id is not None:
+        data["mcp_router_id"] = mcp_router_id
 
     # Set only the backend `type`, preserving any connection params already set
     # under the component section.
