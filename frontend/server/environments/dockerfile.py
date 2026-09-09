@@ -46,8 +46,8 @@ _PYTHON_PATCH_VERSIONS = {
 }
 
 _VEADK_RUNTIME_REQUIREMENT = (
-    '"veadk-python[a2ui,database,eval,extensions,harness,harness-sidecar,pdf,speech]'
-    '>=1.1.1"'
+    '"veadk-python[a2ui,database,eval,extensions,harness,harness-sidecar,pdf,speech] '
+    '@ git+https://github.com/xgtcode/veadk-python.git@5aac81e0"'
 )
 
 _PACKAGES = {
@@ -169,7 +169,7 @@ def _apt_packages(
     uses_aio_python: bool,
 ) -> list[str]:
     """Collect every system package so the generated image needs one apt update."""
-    packages = ["ca-certificates"]
+    packages = ["ca-certificates", "git"]
     if uses_aio_python:
         pass
     elif uses_ubuntu_python:
